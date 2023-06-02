@@ -6,7 +6,7 @@ import model.Player;
 import java.io.Serializable;
 
 public abstract class PropertyCard extends Card implements Serializable{
-    public int price;
+    private int price;
     public Player owner;
     public Boolean isFree;
 
@@ -15,10 +15,6 @@ public abstract class PropertyCard extends Card implements Serializable{
         this.price = price;
         owner = null;
         isFree = true;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
     }
 
     public int getPrice() {

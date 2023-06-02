@@ -2,15 +2,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class TcpClient {
-    public String ip;
-    public int port;
     TcpClient(String ip, int port, String name) {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -21,7 +17,7 @@ public class TcpClient {
 
                     // получаем потоки для чтения и записи в сокет
                     OutputStream out = socket.getOutputStream();
-                    InputStream in = socket.getInputStream();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                     GameWindow gamewindow = new GameWindow(name,-1,out);
                     gamewindow.pack();
@@ -52,12 +48,6 @@ public class TcpClient {
                                 Messages.StartMsg startMsg = gson.fromJson(fromServer, Messages.StartMsg.class);
                                 gamewindow.updTurn(startMsg);
                                 break;
-                            case MoveMsg:
-                                /*Messages.MoveMsg moveMsg = gson.fromJson(fromServer, Messages.MoveMsg.class);
-                                gamewindow.movePl(moveMsg);
-                                gamewindow.updGUI(moveMsg);
-                                gamewindow.gamePanel.ta.append(moveMsg.Dice1 + "   " + moveMsg.Dice2 + "\n");
-                                break;*/
                             case UpdCardMsg:
                                 Messages.UpdCardMsg updCardMsg = gson.fromJson(fromServer, Messages.UpdCardMsg.class);
                                 gamewindow.updCard(updCardMsg);

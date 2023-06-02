@@ -22,7 +22,6 @@ public class GameWindow extends JFrame {
     private JLabel[] pl_position;
     public JLabel my_name;
     public JLabel my_money;
-    private JLabel my_own;
     private JLabel my_position;
 
     private JButton roll_dice;
@@ -40,7 +39,7 @@ public class GameWindow extends JFrame {
         this.id = id;
         activeID = -1;
         player = new ArrayList<>();
-        for (int i = 0;i< 4; i++){
+        for (int i = 0;i < 4; i++){
             player.add(new Player(i));
         }
         cards = new Card[40];
@@ -62,13 +61,13 @@ public class GameWindow extends JFrame {
         pl_position = new JLabel[4];
         for (int i = 0; i < 4; i++){
             JPanel pl_stat = new JPanel(new GridLayout(3,1,5,5));
-            int r= player.get(i).colorR;
-            int gr= player.get(i).colorG;
-            int b= player.get(i).colorB;
+            int r = player.get(i).colorR;
+            int gr = player.get(i).colorG;
+            int b = player.get(i).colorB;
             pl_stat.setBackground(new Color(r,gr,b));
             pl_name[i] = new JLabel("Игрок " + player.get(i).name);
             pl_stat.add(pl_name[i]);
-            pl_money[i] = new JLabel("Деньги = 150");
+            pl_money[i] = new JLabel("Деньги = 1500");
             pl_stat.add(pl_money[i]);
             pl_position[i] = new JLabel("Позиция = 0");
             pl_stat.add(pl_position[i]);
@@ -80,10 +79,8 @@ public class GameWindow extends JFrame {
         player_stat.setPreferredSize(new Dimension(150,700));
         my_name = new JLabel("Игрок " + name);
         player_stat.add(my_name);
-        my_money = new JLabel("Деньги = 150");
+        my_money = new JLabel("Деньги = 1500");
         player_stat.add(my_money);
-        my_own = new JLabel("Имущество = ");
-        player_stat.add(my_own);
         my_position = new JLabel("Позиция = 0");
         player_stat.add(my_position);
         trade = new JButton("Предложить обмен");
@@ -91,11 +88,8 @@ public class GameWindow extends JFrame {
         trade.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JDialog dialog = null;
                 try {
-                    dialog = createTradeDialog(GameWindow.this,id,true);
-                    dialog.pack();
-                    dialog.setVisible(true);
+                    createTradeDialog(GameWindow.this,id,true);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -159,7 +153,16 @@ public class GameWindow extends JFrame {
 
     }
     public void updGUI(){
-        buy.setEnabled(activeID == id && cards[player.get(id).position] instanceof PropertyCard && ((PropertyCard) cards[player.get(id).position]).isFree && player.get(activeID).money >= ((PropertyCard) cards[player.get(id).position]).price);
+        buy.setEnabled(activeID == id && cards[player.get(id).position] instanceof PropertyCard && ((PropertyCard) cards[player.get(id).position]).isFree && player.get(activeID).money >= ((PropertyCard) cards[player.get(id).position]).getPrice());
+
+        for (int i = 0; i < 4; i++){
+            pl_name[i].setText("Игрок " + player.get(i).name);
+            pl_money[i].setText("Деньги = "+ player.get(i).money);
+            pl_position[i].setText("Позиция = " + player.get(i).position);
+        }
+        my_money = new JLabel("Деньги = "+ player.get(id).money);
+        my_position = new JLabel("Позиция = "+ player.get(id).position);
+
     }
     public void updTurn(Messages.StartMsg startMsg) {
         activeID = startMsg.activeId;
@@ -209,13 +212,6 @@ public class GameWindow extends JFrame {
         dialog.setVisible(true);
     }
     public void updAllPl(){
-        for (int i = 0; i < 4; i++){
-            pl_name[i].setText("Игрок " + player.get(i).name);
-            pl_money[i].setText("Деньги = "+ player.get(i).money);
-            pl_position[i].setText("Позиция = " + player.get(i).position);
-        }
-        my_money = new JLabel("Деньги = "+ player.get(id).money);
-        my_position = new JLabel("Позиция = "+ player.get(id).position);
 
     }
     public void updPlNames(){
@@ -223,7 +219,7 @@ public class GameWindow extends JFrame {
             pl_name[i].setText("Игрок " + player.get(i).name);
         }
     }
-    public JDialog createTradeDialog(GameWindow board, int id, boolean modal) throws IOException {
+    public void createTradeDialog(GameWindow board, int id, boolean modal) throws IOException {
         JDialog dialog = new JDialog(board, Integer.toString(id), modal);
         dialog.setLayout(new BorderLayout());
 
@@ -319,9 +315,8 @@ public class GameWindow extends JFrame {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        return dialog;
     }
-    public JDialog createAnswDialog(Messages.TradeMsg tradeMsg, GameWindow board, int id, boolean modal) throws IOException {
+    public void createAnswDialog(Messages.TradeMsg tradeMsg, GameWindow board, int id, boolean modal) throws IOException {
         JDialog dialog = new JDialog(board, Integer.toString(id), modal);
         dialog.setLayout(new BorderLayout());
 
@@ -399,7 +394,6 @@ public class GameWindow extends JFrame {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        return dialog;
     }
     public void getTrade(Messages.TradeMsg tradeMsg){
         player.get(tradeMsg.idFrom).pay(tradeMsg.moneyFrom);
@@ -506,10 +500,8 @@ public class GameWindow extends JFrame {
     }
     public void rollBtnPressed(){
         Gson gson = new Gson();
-
         int dice1 = (int)(Math.random() * 5 + 1);
         int dice2 = (int)(Math.random() * 5 + 1);
-
         Messages.MoveMsg moveMessage = new Messages.MoveMsg();
         moveMessage.idPlayer = id;
         moveMessage.Dice1 = dice1;
@@ -519,10 +511,11 @@ public class GameWindow extends JFrame {
     public void updPl(Messages.UpdPlMsg plMsg){
         int id = plMsg.id;
         Player pl = player.get(id);
-        pl.money = plMsg.money;
         pl.name = plMsg.name;
         pl.money = plMsg.money;
         pl.position = plMsg.position;
+        pl.inPrison = plMsg.inPrison;
+        pl.skipNum = plMsg.skipNum;
     }
     public void updCard(Messages.UpdCardMsg updMsg){
         int cardId = updMsg.cardID;

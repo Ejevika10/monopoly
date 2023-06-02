@@ -45,6 +45,8 @@ public class Messages {
         public int id;
         public int money;
         public int position;
+        public boolean inPrison;
+        public int skipNum;
         public MsgType type = MsgType.UpdPlMsg;
     }
     public static class BuildMsg{

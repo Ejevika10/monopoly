@@ -93,9 +93,7 @@ public class BoardDisplay extends JPanel {
 
             }
         });
-
     }
-
     public void paintComponent(Graphics g) {
         g.drawImage(field, 0, 0,700, 700, null);
         g.setColor(Color.WHITE);
@@ -146,32 +144,56 @@ public class BoardDisplay extends JPanel {
             gr= board.player.get(0).colorG;
             b= board.player.get(0).colorB;
             g.setColor(new Color(r,gr,b));
-            g.fillOval(board.cards[board.player.get(0).position].posX + 5,board.cards[board.player.get(0).position].posY + 5,20,20);
-            g.drawOval(board.cards[board.player.get(0).position].posX + 5,board.cards[board.player.get(0).position].posY + 5,20,20);
+            if (board.player.get(0).inPrison) {
+                g.fillOval(board.cards[10].posX + 55, board.cards[10].posY + 5, 20, 20);
+                g.drawOval(board.cards[10].posX + 55, board.cards[10].posY + 5, 20, 20);
+            }
+            else{
+                g.fillOval(board.cards[board.player.get(0).position].posX + 5,board.cards[board.player.get(0).position].posY + 5,20,20);
+                g.drawOval(board.cards[board.player.get(0).position].posX + 5,board.cards[board.player.get(0).position].posY + 5,20,20);
+            }
         }
         if(board.player.get(1).inGame) {
             r = board.player.get(1).colorR;
             gr = board.player.get(1).colorG;
             b = board.player.get(1).colorB;
             g.setColor(new Color(r, gr, b));
-            g.fillOval(board.cards[board.player.get(1).position].posX + 33, board.cards[board.player.get(1).position].posY + 5, 20, 20);
-            g.drawOval(board.cards[board.player.get(1).position].posX + 33, board.cards[board.player.get(1).position].posY + 5, 20, 20);
+            if (board.player.get(1).inPrison){
+                g.fillOval(board.cards[10].posX + 67, board.cards[10].posY + 25, 20, 20);
+                g.drawOval(board.cards[10].posX + 67, board.cards[10].posY + 25, 20, 20);
+            }
+            else{
+                g.fillOval(board.cards[board.player.get(1).position].posX + 33, board.cards[board.player.get(1).position].posY + 5, 20, 20);
+                g.drawOval(board.cards[board.player.get(1).position].posX + 33, board.cards[board.player.get(1).position].posY + 5, 20, 20);
+            }
         }
         if(board.player.get(2).inGame) {
             r = board.player.get(2).colorR;
             gr = board.player.get(2).colorG;
             b = board.player.get(2).colorB;
             g.setColor(new Color(r, gr, b));
-            g.fillOval(board.cards[board.player.get(2).position].posX + 5, board.cards[board.player.get(2).position].posY + 33, 20, 20);
-            g.drawOval(board.cards[board.player.get(2).position].posX + 5, board.cards[board.player.get(2).position].posY + 33, 20, 20);
+            if (board.player.get(2).inPrison){
+                g.fillOval(board.cards[10].posX + 55, board.cards[10].posY + 43, 20, 20);
+                g.drawOval(board.cards[10].posX + 55, board.cards[10].posY + 43, 20, 20);
+            }
+            else {
+                g.fillOval(board.cards[board.player.get(2).position].posX + 5, board.cards[board.player.get(2).position].posY + 33, 20, 20);
+                g.drawOval(board.cards[board.player.get(2).position].posX + 5, board.cards[board.player.get(2).position].posY + 33, 20, 20);
+            }
         }
         if(board.player.get(3).inGame) {
             r = board.player.get(3).colorR;
             gr = board.player.get(3).colorG;
             b = board.player.get(3).colorB;
             g.setColor(new Color(r, gr, b));
-            g.fillOval(board.cards[board.player.get(3).position].posX + 33, board.cards[board.player.get(3).position].posY + 33, 20, 20);
-            g.drawOval(board.cards[board.player.get(3).position].posX + 33, board.cards[board.player.get(3).position].posY + 33, 20, 20);
+            if (board.player.get(3).inPrison){
+                g.fillOval(board.cards[10].posX + 67, board.cards[10].posY + 60, 20, 20);
+                g.drawOval(board.cards[10].posX + 67, board.cards[10].posY + 60, 20, 20);
+            }
+            else {
+                g.fillOval(board.cards[board.player.get(3).position].posX + 33, board.cards[board.player.get(3).position].posY + 33, 20, 20);
+                g.drawOval(board.cards[board.player.get(3).position].posX + 33, board.cards[board.player.get(3).position].posY + 33, 20, 20);
+            }
         }
     }
     private JDialog createCardDialog(GameWindow board, int id, boolean modal) throws IOException {

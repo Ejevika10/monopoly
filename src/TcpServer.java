@@ -114,6 +114,8 @@ public class TcpServer {
         updPlMsg.name = pl.name;
         updPlMsg.money = pl.money;
         updPlMsg.position = pl.position;
+        updPlMsg.inPrison = pl.inPrison;
+        updPlMsg.skipNum = pl.skipNum;
         sendToAll(updPlMsg);
     }
     public void sendCard(int cardId){

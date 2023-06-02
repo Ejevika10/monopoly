@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 public class Player implements Serializable {
     public boolean inGame;
+    public boolean inPrison;
+    public  int skipNum;
+    public int doubleNum;
+    public boolean lastDouble;
     public int id;
     public  String name;
     public int colorR;
@@ -23,6 +27,9 @@ public class Player implements Serializable {
     public Player(int i){
         this.id =  i;
         this.inGame = true;
+        this.inPrison = false;
+        skipNum = 0;
+        doubleNum = 0;
         switch (i) {
             case 0:
                 this.colorR = Color.RED.getRed();
@@ -81,12 +88,36 @@ public class Player implements Serializable {
         money -= amount;
         asset -= amount;
     }
-    public void move(int dice1, int dice2){
+    public boolean move(int dice1, int dice2){
        position = position + dice1 + dice2;
        if (position >= 40){
            getPaid(200);
            position = position % 40;
+           return true;
        }
+       return false;
+    }
+    public void goToPrison(){
+        doubleNum = 0;
+        lastDouble = false;
+        inPrison = true;
+        skipNum = 2;
+        position = 10;
+    }
+    public boolean getDouble(){
+        doubleNum++;
+        lastDouble = true;
+        if(doubleNum == 3){
+            goToPrison();
+            return true;
+        }
+        return false;
+    }
+    public void skipMove(){
+        skipNum--;
+        if (skipNum == 0){
+            inPrison = false;
+        }
     }
     public void getPaid(int amount) {
         money += amount;

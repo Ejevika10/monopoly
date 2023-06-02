@@ -5,8 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class Common {
-    public static String readBytes(java.io.InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    public static String readBytes(BufferedReader reader) throws IOException {
         int length = reader.read();
 
         String string = "";
