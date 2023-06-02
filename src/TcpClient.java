@@ -78,7 +78,6 @@ public class TcpClient {
                                 gamewindow.win(winMsg.id);
                                 break;
                         }
-                        gamewindow.updAllPl();
                         gamewindow.updGUI();
                         gamewindow.gamePanel.repaint();
                     }

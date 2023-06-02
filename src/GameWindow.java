@@ -211,9 +211,6 @@ public class GameWindow extends JFrame {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
-    public void updAllPl(){
-
-    }
     public void updPlNames(){
         for (int i = 0; i < 4; i++){
             pl_name[i].setText("Игрок " + player.get(i).name);
@@ -226,7 +223,7 @@ public class GameWindow extends JFrame {
         ArrayList<String> items = new ArrayList<>();
         for (int i = 0;i < 4; i++){
             if (id != i)
-                items.add(Integer.toString(player.get(i).id));
+                items.add(player.get(i).name);
         }
         ActionListener actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -234,14 +231,14 @@ public class GameWindow extends JFrame {
                 String item = (String)box.getSelectedItem();
 
                 JPanel pnl1 = new JPanel(new BorderLayout());
-                pnl1.setPreferredSize(new Dimension(100,400));
+                pnl1.setPreferredSize(new Dimension(150,400));
                 JLabel lbl1 = new JLabel("Игрок " + item);
                 JTextArea jm1 = new JTextArea("0",1,1);
 
                 DefaultListModel<String> dlm1 = new DefaultListModel<String>();
                 for (int i = 0; i < 40; i++){
-                    if (cards[i] instanceof PropertyCard && ((PropertyCard)cards[i]).owner != null && ((PropertyCard)cards[i]).owner.id == Integer.parseInt(item))
-                        dlm1.addElement(Integer.toString(i));
+                    if (cards[i] instanceof PropertyCard && !((PropertyCard)cards[i]).isFree && ((PropertyCard)cards[i]).owner.name.equals(item))
+                        dlm1.addElement(cards[i].getName());
                 }
                 JList<String> multiple1 = new JList<String>(dlm1);
                 multiple1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -252,13 +249,13 @@ public class GameWindow extends JFrame {
                 pnl1.add(jm1,BorderLayout.SOUTH);
 
                 JPanel pnl2 = new JPanel(new BorderLayout());
-                pnl2.setPreferredSize(new Dimension(100,400));
-                JLabel lbl2 = new JLabel("Игрок " + id);
+                pnl2.setPreferredSize(new Dimension(150,400));
+                JLabel lbl2 = new JLabel("Игрок " + player.get(id).name);
                 JTextArea jm2 = new JTextArea("0",1,1);
                 DefaultListModel<String> dlm2 = new DefaultListModel<String>();
                 for (int i = 0; i < 40; i++){
-                    if (cards[i] instanceof PropertyCard &&  ((PropertyCard)cards[i]).owner != null && ((PropertyCard)cards[i]).owner.id == id)
-                        dlm2.addElement(Integer.toString(i));
+                    if (cards[i] instanceof PropertyCard &&  !((PropertyCard)cards[i]).isFree && ((PropertyCard)cards[i]).owner.id == id)
+                        dlm2.addElement(cards[i].getName());
                 }
                 JList<String> multiple2 = new JList<String>(dlm2);
                 multiple2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -278,17 +275,17 @@ public class GameWindow extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         Object[] pl1 = multiple1.getSelectedValues();
                         int[] pl1Cards = new int[pl1.length];
-                        for (int i = 0; i<pl1.length;i++){
-                            pl1Cards[i] = Integer.parseInt((String)pl1[i]);
+                        for (int i = 0; i < pl1.length;i++){
+                            pl1Cards[i] = getCardByName((String) pl1[i]);
                         }
                         Object[] pl2 = multiple2.getSelectedValues();
                         int[] pl2Cards = new int[pl2.length];
-                        for (int i = 0; i<pl2.length;i++){
-                            pl2Cards[i] = Integer.parseInt((String)pl2[i]);
+                        for (int i = 0; i < pl2.length;i++){
+                            pl2Cards[i] = getCardByName((String) pl2[i]);
                         }
                         int pl1Money = Integer.parseInt(jm1.getText());
                         int pl2Money = Integer.parseInt(jm2.getText());
-                        int id1 = Integer.parseInt(item);
+                        int id1 = getPlByName(item);
 
                         Gson gson = new Gson();
                         Messages.TradeMsg tradeMsg = new Messages.TradeMsg();
@@ -311,7 +308,7 @@ public class GameWindow extends JFrame {
         comboBox.addActionListener(actionListener);
         dialog.add(comboBox,BorderLayout.NORTH);
 
-        dialog.setPreferredSize(new Dimension(250, 500));
+        dialog.setPreferredSize(new Dimension(350, 500));
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -321,13 +318,13 @@ public class GameWindow extends JFrame {
         dialog.setLayout(new BorderLayout());
 
         JPanel pnl1 = new JPanel(new BorderLayout());
-        pnl1.setPreferredSize(new Dimension(100,400));
-        JLabel lbl1 = new JLabel("Игрок " + tradeMsg.idFrom);
+        pnl1.setPreferredSize(new Dimension(150,400));
+        JLabel lbl1 = new JLabel("Игрок " + player.get(tradeMsg.idFrom).name);
         JTextArea jm1 = new JTextArea(Integer.toString(tradeMsg.moneyFrom),1,1);
 
         DefaultListModel<String> dlm1 = new DefaultListModel<String>();
         for (int i = 0; i < tradeMsg.cardsFrom.length; i++){
-            dlm1.addElement(Integer.toString(tradeMsg.cardsFrom[i]));
+            dlm1.addElement(cards[tradeMsg.cardsFrom[i]].getName());
         }
         JList<String> multiple1 = new JList<String>(dlm1);
         multiple1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -338,12 +335,12 @@ public class GameWindow extends JFrame {
         pnl1.add(jm1,BorderLayout.SOUTH);
 
         JPanel pnl2 = new JPanel(new BorderLayout());
-        pnl2.setPreferredSize(new Dimension(100,400));
-        JLabel lbl2 = new JLabel("Игрок " + tradeMsg.idTo);
+        pnl2.setPreferredSize(new Dimension(150,400));
+        JLabel lbl2 = new JLabel("Игрок " + player.get(tradeMsg.idTo).name);
         JTextArea jm2 = new JTextArea(Integer.toString(tradeMsg.moneyTo),1,1);
         DefaultListModel<String> dlm2 = new DefaultListModel<String>();
         for (int i = 0; i < tradeMsg.cardsTo.length; i++){
-            dlm2.addElement(Integer.toString(tradeMsg.cardsTo[i]));
+            dlm2.addElement(cards[tradeMsg.cardsTo[i]].getName());
         }
         JList<String> multiple2 = new JList<String>(dlm2);
         multiple2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -390,7 +387,7 @@ public class GameWindow extends JFrame {
             }
         });
 
-        dialog.setPreferredSize(new Dimension(250, 500));
+        dialog.setPreferredSize(new Dimension(350, 500));
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -484,30 +481,6 @@ public class GameWindow extends JFrame {
                 this.id = i;
         }
     }
-    public void buyBtnPressed(){
-        Gson gson = new Gson();
-        Messages.BuyMsg buyMsg = new Messages.BuyMsg();
-        buyMsg.idCard = player.get(id).position;
-        buyMsg.idPlayer = id;
-        Common.writeBytes(socketOut, gson.toJson(buyMsg));
-    }
-    public void buyHouseBtnPressed(int cardId){
-        Gson gson = new Gson();
-        Messages.BuildMsg buildMsg = new Messages.BuildMsg();
-        buildMsg.idCard = cardId;
-        buildMsg.idPlayer = id;
-        Common.writeBytes(socketOut, gson.toJson(buildMsg));
-    }
-    public void rollBtnPressed(){
-        Gson gson = new Gson();
-        int dice1 = (int)(Math.random() * 5 + 1);
-        int dice2 = (int)(Math.random() * 5 + 1);
-        Messages.MoveMsg moveMessage = new Messages.MoveMsg();
-        moveMessage.idPlayer = id;
-        moveMessage.Dice1 = dice1;
-        moveMessage.Dice2 = dice2;
-        Common.writeBytes(socketOut, gson.toJson(moveMessage));
-    }
     public void updPl(Messages.UpdPlMsg plMsg){
         int id = plMsg.id;
         Player pl = player.get(id);
@@ -520,6 +493,7 @@ public class GameWindow extends JFrame {
     public void updCard(Messages.UpdCardMsg updMsg){
         int cardId = updMsg.cardID;
         ((PropertyCard)cards[cardId]).isFree = updMsg.isFree;
+        ((PropertyCard)cards[cardId]).inDeposit = updMsg.inDeposit;
         if (! updMsg.isFree) {
             if (((PropertyCard) cards[cardId]).owner != null) {
                 if (cards[cardId] instanceof UtilityCard)
@@ -542,4 +516,69 @@ public class GameWindow extends JFrame {
             ((EstateCard) cards[cardId]).houseCount = updMsg.houseCount;
         }
     }
+
+
+    public void buyBtnPressed(){
+        Gson gson = new Gson();
+        Messages.BuyMsg buyMsg = new Messages.BuyMsg();
+        buyMsg.idCard = player.get(id).position;
+        buyMsg.idPlayer = id;
+        Common.writeBytes(socketOut, gson.toJson(buyMsg));
+    }
+    public void rollBtnPressed(){
+        Gson gson = new Gson();
+        int dice1 = (int)(Math.random() * 5 + 1);
+        int dice2 = (int)(Math.random() * 5 + 1);
+        Messages.MoveMsg moveMessage = new Messages.MoveMsg();
+        moveMessage.idPlayer = id;
+        moveMessage.Dice1 = dice1;
+        moveMessage.Dice2 = dice2;
+        Common.writeBytes(socketOut, gson.toJson(moveMessage));
+    }
+
+
+    public void depositCardBtnPressed(int cardId){
+        Gson gson = new Gson();
+        Messages.DepositMsg depositMsg = new Messages.DepositMsg();
+        depositMsg.idCard = cardId;
+        depositMsg.idPlayer = id;
+        Common.writeBytes(socketOut, gson.toJson(depositMsg));
+    }
+    public void ransomCardBtnPressed(int cardId){
+        Gson gson = new Gson();
+        Messages.RansomMsg ransomMsg = new Messages.RansomMsg();
+        ransomMsg.idCard = cardId;
+        ransomMsg.idPlayer = id;
+        Common.writeBytes(socketOut, gson.toJson(ransomMsg));
+    }
+    public void buyHouseBtnPressed(int cardId){
+        Gson gson = new Gson();
+        Messages.BuildMsg buildMsg = new Messages.BuildMsg();
+        buildMsg.idCard = cardId;
+        buildMsg.idPlayer = id;
+        Common.writeBytes(socketOut, gson.toJson(buildMsg));
+    }
+    public void sellHouseBtnPressed(int cardId){
+        Gson gson = new Gson();
+        Messages.SellMsg sellMsg = new Messages.SellMsg();
+        sellMsg.idCard = cardId;
+        sellMsg.idPlayer = id;
+        Common.writeBytes(socketOut, gson.toJson(sellMsg));
+    }
+
+    public int getCardByName(String name){
+        for (int i = 0; i < 40; i++){
+            if(cards[i].getName().equals(name))
+                return i;
+        }
+        return -1;
+    }
+    public int getPlByName(String name){
+        for (Player pl:player) {
+            if(pl.name.equals(name))
+                return pl.id;
+        }
+        return -1;
+    }
+
 }

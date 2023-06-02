@@ -94,6 +94,103 @@ public class BoardDisplay extends JPanel {
             }
         });
     }
+    private JDialog createCardDialog(GameWindow board, int id, boolean modal) throws IOException {
+        JDialog dialog = new JDialog(board, Integer.toString(id), modal);
+        dialog.setLayout(new FlowLayout());
+        dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        dialog.setPreferredSize(new Dimension(300,615));
+        String pathName = "img/cards/card" + id + ".png";
+        JLabel jl = new JLabel(new ImageIcon(read(new File(pathName))));
+        JButton btn_deposit = new JButton("Заложить");
+        JButton btn_ransom = new JButton("Выкупить");
+        JButton btn_build = new JButton("Построить");
+        JButton btn_sell = new JButton("Продать постройку");
+        btn_deposit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.depositCardBtnPressed(id);
+            }
+        });
+        btn_ransom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.ransomCardBtnPressed(id);
+            }
+        });
+        btn_build.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.buyHouseBtnPressed(id);
+            }
+        });
+        btn_sell.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.sellHouseBtnPressed(id);
+            }
+        });
+
+        btn_deposit.setEnabled(false);
+        btn_ransom.setEnabled(false);
+        btn_build.setEnabled(false);
+        btn_sell.setEnabled(false);
+        if(board.cards[id] instanceof PropertyCard && ((PropertyCard)board.cards[id]).owner != null && ((PropertyCard)board.cards[id]).owner.id == board.id)
+        {
+            if (!((PropertyCard)board.cards[id]).inDeposit) {
+                boolean canDeposit = true;
+                if (board.cards[id] instanceof  EstateCard){
+                    int groupId = ((EstateCard)board.cards[id]).groupId;
+                    for (int i = 0; i < 40; i++){
+                        if (board.cards[i] instanceof EstateCard && ((EstateCard)board.cards[i]).groupId == groupId)
+                            if( ((EstateCard)board.cards[i]).houseCount != 0 || ((EstateCard)board.cards[i]).hotelCount != 0) {
+                                canDeposit = false;
+                                break;
+                            }
+                    }
+                }
+                btn_deposit.setEnabled(canDeposit);
+            }
+            else {
+                if(board.player.get(board.id).money >= ((PropertyCard) board.cards[id]).getPrice() * 0.55)
+                    btn_ransom.setEnabled(true);
+            }
+
+            if (board.cards[id] instanceof EstateCard){
+                if (board.player.get(board.id).getGroupCount(((EstateCard) board.cards[id]).groupId) == ((EstateCard) board.cards[id]).groupMaxCount &&
+                        ((EstateCard) board.cards[id]).hotelCount < ((EstateCard) board.cards[id]).MAX_HOTEL_COUNT &&
+                        board.player.get(board.id).money >= ((EstateCard) board.cards[id]).getHousePrice())
+                    btn_build.setEnabled(true);
+                if ( ((EstateCard) board.cards[id]).hotelCount > 0 ||  ((EstateCard) board.cards[id]).houseCount > 0)
+                    btn_sell.setEnabled(true);
+            }
+        }
+
+        dialog.add(jl);
+        dialog.add(btn_deposit);
+        dialog.add(btn_ransom);
+        dialog.add(btn_build);
+        dialog.add(btn_sell);
+        return dialog;
+    }
+    public int isClickedIn(int x, int y){
+        for (int i = 0; i < 9;i++){
+            if(x >= 90 + 58*i && x <= 90 + 58*(i+1) && y < 90)
+                return i+1;
+        }
+        for (int i = 0; i < 9;i++){
+            if(x >= 610 && y > 90 + 58*i && y < 90 + 58*(i+1))
+                return i+11;
+        }
+        for (int i = 0; i < 9;i++){
+            if(x >= 610 - 58*(i+1) && x <= 610 - 58*i && y > 610)
+                return i+21;
+        }
+        for (int i = 0; i < 9;i++){
+            if(x <= 90 && y >= 610 - 58*(i+1) && y <= 610 - 58*i)
+                return i+31;
+        }
+        return -1;
+    }
     public void paintComponent(Graphics g) {
         g.drawImage(field, 0, 0,700, 700, null);
         g.setColor(Color.WHITE);
@@ -129,7 +226,11 @@ public class BoardDisplay extends JPanel {
                 g.setColor(new Color(r,gr,b));
                 g.fillRect(board.cards[i].posX + 5,board.cards[i].posY + 5,20,20);
                 g.drawRect(board.cards[i].posX + 5,board.cards[i].posY + 5,20,20);
-
+                if (((PropertyCard) board.cards[i]).inDeposit){
+                    g.setColor(Color.BLACK);
+                    g.drawLine(board.cards[i].posX + 5,board.cards[i].posY + 5,board.cards[i].posX + 25,board.cards[i].posY + 25);
+                    g.drawLine(board.cards[i].posX + 5,board.cards[i].posY + 25,board.cards[i].posX + 25,board.cards[i].posY + 5);
+                }
                 if(board.cards[i] instanceof EstateCard && ((EstateCard) board.cards[i]).houseCount > 0){
                     Font font = new Font("Serif", Font.PLAIN, 24);
                     g.setFont(font);
@@ -196,58 +297,5 @@ public class BoardDisplay extends JPanel {
             }
         }
     }
-    private JDialog createCardDialog(GameWindow board, int id, boolean modal) throws IOException {
-        JDialog dialog = new JDialog(board, Integer.toString(id), modal);
-        dialog.setLayout(new FlowLayout());
-        dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        dialog.setPreferredSize(new Dimension(300,590));
-        String pathName = "img/cards/card" + id + ".png";
-        JLabel jl = new JLabel(new ImageIcon(read(new File(pathName))));
 
-        JButton btn_build = new JButton("Построить");
-        btn_build.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                board.buyHouseBtnPressed(id);
-            }
-        });
-        JButton btn_deposit = new JButton("Заложить");
-
-        if(board.cards[id] instanceof PropertyCard&& ((PropertyCard)board.cards[id]).owner != null && ((PropertyCard)board.cards[id]).owner.id == board.id)
-        {
-            btn_deposit.setEnabled(true);
-            if (board.cards[id] instanceof EstateCard &&
-                    board.player.get(board.id).getGroupCount(((EstateCard) board.cards[id]).groupId) == ((EstateCard) board.cards[id]).groupMaxCount)
-                btn_build.setEnabled(true);
-            else
-                btn_build.setEnabled(false);
-        }
-        else{
-            btn_deposit.setEnabled(false);
-            btn_build.setEnabled(false);
-        }
-        dialog.add(jl);
-        dialog.add(btn_build);
-        dialog.add(btn_deposit);
-        return dialog;
-    }
-    public int isClickedIn(int x, int y){
-        for (int i = 0; i < 9;i++){
-            if(x >= 90 + 58*i && x <= 90 + 58*(i+1) && y < 90)
-                return i+1;
-        }
-        for (int i = 0; i < 9;i++){
-            if(x >= 610 && y > 90 + 58*i && y < 90 + 58*(i+1))
-                return i+11;
-        }
-        for (int i = 0; i < 9;i++){
-            if(x >= 610 - 58*(i+1) && x <= 610 - 58*i && y > 610)
-                return i+21;
-        }
-        for (int i = 0; i < 9;i++){
-            if(x <= 90 && y >= 610 - 58*(i+1) && y <= 610 - 58*i)
-                return i+31;
-        }
-        return -1;
-    }
 }

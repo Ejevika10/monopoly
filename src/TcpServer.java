@@ -121,6 +121,7 @@ public class TcpServer {
     public void sendCard(int cardId){
         Messages.UpdCardMsg updCardMsg = new Messages.UpdCardMsg();
         updCardMsg.cardID = cardId;
+        updCardMsg.inDeposit = ((PropertyCard)gameboard.cards[cardId]).inDeposit;
         updCardMsg.isFree = ((PropertyCard)gameboard.cards[cardId]).isFree;
         if (!updCardMsg.isFree)
         {

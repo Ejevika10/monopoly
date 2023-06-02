@@ -45,7 +45,7 @@ public class GameBoard {
         server.sendPl(activePlayer);
         int pos = curPl.position;
 
-        if(cards[pos] instanceof PropertyCard && !((PropertyCard)cards[pos]).isFree && move.idPlayer != ((PropertyCard)cards[pos]).owner.id) {
+        if(cards[pos] instanceof PropertyCard && !((PropertyCard)cards[pos]).inDeposit && !((PropertyCard)cards[pos]).isFree && move.idPlayer != ((PropertyCard)cards[pos]).owner.id) {
             int rent = ((PropertyCard)cards[pos]).getRentPrice();
             if (cards[pos]  instanceof UtilityCard) {
                 rent *= (dice1 + dice2);

@@ -13,7 +13,7 @@ public class EstateCard extends PropertyCard {
     public int houseCount;
     public int hotelCount;
     private final ArrayList<Integer> rentPrices;
-    final public int MAX_HOTEL = 1;
+    final public int MAX_HOTEL_COUNT = 1;
     final public int MAX_HOUSE_COUNT = 4;
     public EstateCard(int id,String name, int x, int y, int price,int groupId,int groupMaxCount, int rent, int oneHouseRent,
                       int twoHouseRent, int threeHouseRent,int fourHouseRent, int hotelRent, int housePrice,
@@ -48,7 +48,7 @@ public class EstateCard extends PropertyCard {
     }
     public int getRentPrice() {
         int rentPrice;
-        if (hotelCount == MAX_HOTEL)
+        if (hotelCount == MAX_HOTEL_COUNT)
             rentPrice = rentPrices.get(4);
         else
             rentPrice = rentPrices.get(houseCount);

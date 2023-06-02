@@ -7,6 +7,9 @@ public class Messages {
         UpdPlMsg,
         UpdCardMsg,
         BuildMsg,
+        SellMsg,
+        DepositMsg,
+        RansomMsg,
         BuyMsg,
         TradeMsg,
         MoveMsg,
@@ -36,6 +39,7 @@ public class Messages {
         public int cardID;
         public int owner;
         public boolean isFree;
+        public boolean inDeposit;
         public int houseCount;
         public int hotelCount;
         public MsgType type = MsgType.UpdCardMsg;
@@ -54,6 +58,22 @@ public class Messages {
         public int  idPlayer;
         public MsgType type = MsgType.BuildMsg;
     }
+    public static class SellMsg{
+        public int idCard;
+        public int  idPlayer;
+        public MsgType type = MsgType.SellMsg;
+    }
+    public static class DepositMsg{
+        public int idCard;
+        public int  idPlayer;
+        public MsgType type = MsgType.DepositMsg;
+    }
+    public static class RansomMsg{
+        public int idCard;
+        public int  idPlayer;
+        public MsgType type = MsgType.RansomMsg;
+    }
+
     public static class BuyMsg{
         public int idCard;
         public int  idPlayer;

@@ -75,12 +75,33 @@ public class PlayerHandler extends Thread{
                         server.sendPl(buyMsg.idPlayer);
                         server.sendCard(buyMsg.idCard);
                     }
+                    case DepositMsg -> {
+                        Messages.DepositMsg depositMsg = gson.fromJson(Buf, Messages.DepositMsg.class);
+                        server.sendServerMsg("Игрок " + server.gameboard.players.get(depositMsg.idPlayer).name + " закладывает поле " + server.gameboard.cards[depositMsg.idCard].getName());
+                        server.gameboard.players.get(depositMsg.idPlayer).depositCard((PropertyCard) server.gameboard.cards[depositMsg.idCard]);
+                        server.sendPl(depositMsg.idPlayer);
+                        server.sendCard(depositMsg.idCard);
+                    }
+                    case RansomMsg -> {
+                        Messages.RansomMsg ransomMsg = gson.fromJson(Buf, Messages.RansomMsg.class);
+                        server.sendServerMsg("Игрок " + server.gameboard.players.get(ransomMsg.idPlayer).name + " выкупает поле " + server.gameboard.cards[ransomMsg.idCard].getName());
+                        server.gameboard.players.get(ransomMsg.idPlayer).ransomCard((PropertyCard) server.gameboard.cards[ransomMsg.idCard]);
+                        server.sendPl(ransomMsg.idPlayer);
+                        server.sendCard(ransomMsg.idCard);
+                    }
                     case BuildMsg -> {
                         Messages.BuildMsg buildMsg = gson.fromJson(Buf, Messages.BuildMsg.class);
                         server.sendServerMsg("Игрок " + server.gameboard.players.get(buildMsg.idPlayer).name + " строит дом на поле " + server.gameboard.cards[buildMsg.idCard].getName());
                         server.gameboard.players.get(buildMsg.idPlayer).buyHouse((EstateCard) server.gameboard.cards[buildMsg.idCard]);
                         server.sendPl(buildMsg.idPlayer);
                         server.sendCard(buildMsg.idCard);
+                    }
+                    case SellMsg -> {
+                        Messages.SellMsg sellMsg = gson.fromJson(Buf, Messages.SellMsg.class);
+                        server.sendServerMsg("Игрок " + server.gameboard.players.get(sellMsg.idPlayer).name + " продает здание на поле " + server.gameboard.cards[sellMsg.idCard].getName());
+                        server.gameboard.players.get(sellMsg.idPlayer).sellHouse((EstateCard) server.gameboard.cards[sellMsg.idCard]);
+                        server.sendPl(sellMsg.idPlayer);
+                        server.sendCard(sellMsg.idCard);
                     }
                     case TradeMsg -> {
                         Messages.TradeMsg tradeMsg = gson.fromJson(Buf, Messages.TradeMsg.class);

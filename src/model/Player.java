@@ -72,16 +72,36 @@ public class Player implements Serializable {
         pay(card.getPrice());
         asset += card.getPrice() / 2;
     }
+    public void depositCard(PropertyCard card){
+        card.inDeposit = true;
+        getPaid(card.getPrice()/2);
+    }
+    public void ransomCard(PropertyCard card){
+        card.inDeposit = false;
+        pay((int)(card.getPrice() * 0.55));
+    }
     public void buyHouse(EstateCard card){
         if(card.getHouseCount() < card.MAX_HOUSE_COUNT){
             pay(card.getHousePrice());
             asset += card.getHousePrice() / 2;
             card.buildHouse();
         }
-        else if(card.getHotelCount() < card.MAX_HOTEL){
+        else if(card.getHotelCount() < card.MAX_HOTEL_COUNT){
             pay(card.getHotelPrice());
             asset += card.getHotelPrice() / 2;
             card.buildHotel();
+        }
+    }
+    public void sellHouse(EstateCard card){
+        if (card.getHotelCount() > 0) {
+            card.hotelCount--;
+            getPaid(card.getHotelPrice());
+            if (card.hotelCount == 0)
+                card.houseCount = card.MAX_HOUSE_COUNT;
+        }
+        else if(card.getHouseCount() > 0){
+            card.houseCount--;
+            getPaid(card.getHousePrice());
         }
     }
     public void pay(int amount) {
@@ -124,15 +144,25 @@ public class Player implements Serializable {
         asset += amount;
     }
     public int getUtilityCount() {
-        return utilities.size();
+        int num = 0;
+        for (UtilityCard util:utilities) {
+            if (!util.inDeposit)
+                num++;
+        }
+        return num;
     }
     public int getRailroadCount() {
-        return railroads.size();
+        int num = 0;
+        for (RailroadCard rail:railroads) {
+            if (!rail.inDeposit)
+                num++;
+        }
+        return num;
     }
     public int getGroupCount(int groupId){
         int num = 0;
         for (EstateCard est:estates) {
-            if (est.groupId == groupId)
+            if (est.groupId == groupId & !est.inDeposit)
                 num++;
         }
         return num;

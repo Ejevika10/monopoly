@@ -9,12 +9,14 @@ public abstract class PropertyCard extends Card implements Serializable{
     private int price;
     public Player owner;
     public Boolean isFree;
+    public Boolean inDeposit;
 
     public PropertyCard(int id, String name, int x, int y,int price) {
         super(id, name, x, y);
         this.price = price;
         owner = null;
         isFree = true;
+        inDeposit = false;
     }
 
     public int getPrice() {
